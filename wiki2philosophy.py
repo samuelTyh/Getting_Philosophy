@@ -17,20 +17,21 @@ def get_1st_link(page):
 
         soup = BeautifulSoup(resp, 'lxml')
         content_div = soup.find('div', {'class': "mw-parser-output"})
+        a_link_list = []
         for element in content_div.find_all('p', recursive=False):
+            breaking = False
             for a_tag in element.find_all('a', recursive=False):
-                global a_link
                 a_link = a_tag.get('href')
-                if re.match(r"\/\D*\(\S*\)", a_link):
-                    # print(a_link)
-                    continue
+                # print(a_link)
+                if bool(re.search("/wiki/.*", a_link)):
+                    if not bool(re.search("/wiki/\w*\(+\w+\)+\w*", a_link)):
+                        a_link_list.append(a_link)
                 else:
+                    breaking = True
                     break
-            # print(a_link)
-            break
-
-        if not a_link:
-            return
+            if breaking:
+                break
+        a_link = a_link_list[0]
 
         first_link = urljoin('https://en.wikipedia.org/', a_link)
         return first_link
