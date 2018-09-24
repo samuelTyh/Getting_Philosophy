@@ -21,33 +21,33 @@ def get_1st_link(page):
            page is 'philosophy', then return origin page.
 
        """
-    if page != 'https://en.wikipedia.org/wiki/Philosophy':
-        ua = UserAgent()
-        headers = {'User-Agent': ua.random}
-        req = requests.get(page, headers=headers)
-        resp = req.text
-
-        soup = BeautifulSoup(resp, 'lxml')
-        content_div = soup.find('div', {'class': "mw-parser-output"})
-        a_link_list = []
-        for element in content_div.find_all('p', recursive=False):
-            breaking = False
-            for a_tag in element.find_all('a', recursive=False):
-                a_link = a_tag.get('href')
-                if bool(re.search("/wiki/.*", a_link)):
-                    if not bool(re.search("/wiki/\w*\(+\w+\)+\w*", a_link)):
-                        a_link_list.append(a_link)
-                else:
-                    breaking = True
-                    break
-            if breaking:
-                break
-        a_link = a_link_list[0]
-
-        first_link = urljoin('https://en.wikipedia.org/', a_link)
-        return first_link
-    else:
+    if page == 'https://en.wikipedia.org/wiki/Philosophy':
         return page
+
+    ua = UserAgent()
+    headers = {'User-Agent': ua.random}
+    req = requests.get(page, headers=headers)
+    resp = req.text
+
+    soup = BeautifulSoup(resp, 'lxml')
+    content_div = soup.find('div', {'class': "mw-parser-output"})
+    a_link_list = []
+    for element in content_div.find_all('p', recursive=False):
+        breaking = False
+        for a_tag in element.find_all('a', recursive=False):
+            a_link = a_tag.get('href')
+            if bool(re.search("/wiki/.*", a_link)):
+                if not bool(re.search("/wiki/\w*\(+\w+\)+\w*", a_link)):
+                    a_link_list.append(a_link)
+            else:
+                breaking = True
+                break
+        if breaking:
+            break
+    a_link = a_link_list[0]
+
+    first_link = urljoin('https://en.wikipedia.org/', a_link)
+    return first_link
 
 
 def main():
@@ -71,11 +71,11 @@ def main():
             link = next_link
             i += 1
             if link in past_link:
-                print("Link has repeated, try another one.")
+                print("Oops! Link has repeated after %s times, keep it reality!." % i)
                 break
 
             print('-' * 87)
-            print(link)
+            print(" %d : %s " % (i, link))
         else:
             print("Link %s times to get'Philosophy'" % i)
             break
